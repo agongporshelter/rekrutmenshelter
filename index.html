@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitoring Rekrutmen</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { background-color: #f4f6f9; }
+    .sidebar { min-height: 100vh; background-color: #343a40; padding-top: 20px;}
+    .sidebar a { color: #b0b0b0; padding: 15px 20px; display: block; text-decoration: none; font-size: 14px; }
+    .sidebar a:hover, .sidebar a.active { background-color: #495057; color: #fff; }
+    .content-area { padding: 30px; }
+    .badge-role { font-size: 12px; }
+  </style>
+</head>
+<body>
+
+<!-- GANTI DENGAN URL GOOGLE APPS SCRIPT ANDA -->
+<script>const API_URL = 'MASUKKAN_URL_WEB_APP_GAS_ANDA_DISINI';</script>
+
+<div class="container-fluid">
+  <div class="row">
+    
+    <!-- SIDEBAR -->
+    <div class="col-md-2 sidebar p-0" id="sidebar">
+      <h5 class="text-white text-center py-3 border-bottom border-secondary"><i class="fas fa-users-cog"></i> Rekrutmen</h5>
+      <a href="#" class="active" onclick="showPage('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a href="#" onclick="showPage('requests')"><i class="fas fa-file-alt"></i> Permintaan TK</a>
+      <a href="#" onclick="showPage('users')" id="nav-users" style="display:none;"><i class="fas fa-user-cog"></i> Manajemen User</a>
+      <a href="#" onclick="logout()" class="text-danger mt-5"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="col-md-10 content-area">
+      
+      <!-- HEADER INFO -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h3 id="greeting">Selamat Datang</h3>
+          <span class="badge bg-primary badge-role" id="role-display"></span>
+          <span class="badge bg-secondary badge-role" id="branch-display"></span>
+        </div>
+        <div class="text-muted" id="datetime"></div>
+      </div>
+
+      <!-- PAGE: DASHBOARD -->
+      <div id="page-dashboard">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="card p-4 shadow-sm border-start border-primary border-4">
+              <h6 class="text-muted">Total Permintaan</h6>
+              <h2 id="stat-total-req">0</h2>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card p-4 shadow-sm border-start border-success border-4">
+              <h6 class="text-muted">Kandidat Diterima</h6>
+              <h2 id="stat-accepted">0</h2>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card p-4 shadow-sm border-start border-warning border-4">
+              <h6 class="text-muted">Sisa Kebutuhan</h6>
+              <h2 id="stat-remaining">0</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: PERMINTAAN TK -->
+      <div id="page-requests" style="display:none;">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white d-flex justify-content-between">
+            <h5 class="mb-0">Daftar Permintaan Tenaga Kerja</h5>
+            <button class="btn btn-primary btn-sm" id="btn-add-req" onclick="showRequestForm()">+ Tambah Permintaan</button>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>ID</th><th>Site / Bagian</th><th>Layanan</th><th>Tgl Permintaan</th>
+                    <th>Qty Request</th><th>Qty Mapped</th><th>Diterima</th><th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-requests"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: FORM PERMINTAAN -->
+<div class="modal fade" id="modalRequest" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Form Permintaan TK</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <form id="form-request">
+          <div class="mb-2"><label>Site Type</label><select class="form-select" name="siteType" required><option value="New">New</option><option value="Existing">Existing</option></select></div>
+          <div class="mb-2"><label>Nama Site - Bagian</label><input type="text" class="form-control" name="siteDept" required></div>
+          <div class="mb-2"><label>Tanggal Permintaan</label><input type="date" class="form-control" name="requestDate" required></div>
+          <div class="mb-2"><label>Layanan</label><select class="form-select" name="service" required><option value="Security">Security</option><option value="Labor">Labor</option><option value="Cleaning">Cleaning</option><option value="Logistic">Logistic</option></select></div>
+          <div class="mb-2"><label>Jenis TK</label><select class="form-select" name="workerType" required><option value="Reguler">Reguler</option><option value="Casual">Casual</option></select></div>
+          <div class="mb-2"><label>Jumlah TK (Qty)</label><input type="number" class="form-control" name="qtyRequested" required></div>
+          <div class="mb-2"><label>Durasi Pemenuhan</label><input type="text" class="form-control" name="duration" placeholder="cth: 7 Hari" required></div>
+        </form>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button type="button" class="btn btn-primary" onclick="submitRequest()">Simpan</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: MAPPING RECRUITER -->
+<div class="modal fade" id="modalMapping" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Mapping Recruiter - <span id="map-req-id"></span></h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <form id="form-mapping" class="row g-2 align-items-end mb-3">
+          <div class="col-md-5"><label>Pilih Recruiter</label><select class="form-select" name="recruiterUsername" id="ddl-recruiter" required></select></div>
+          <div class="col-md-4"><label>Jumlah Mapped</label><input type="number" class="form-control" name="qtyMapped" required></div>
+          <div class="col-md-3"><button type="button" class="btn btn-success w-100" onclick="submitMapping()">Assign</button></div>
+        </form>
+        <table class="table table-bordered mt-3">
+          <thead class="table-dark"><tr><th>Recruiter</th><th>Mapped</th><th>Dipanggil</th><th>Dikirim</th><th>Diterima</th><th>Aksi</th></tr></thead>
+          <tbody id="table-mappings"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  let currentUser = JSON.parse(localStorage.getItem('recUser')) || null;
+  
+  // Cek login saat load
+  window.onload = () => {
+    if(!currentUser) doShowLogin();
+    else initApp();
+  };
+
+  // --- API CALL HELPER ---
+  async function apiGet(action, params = {}) {
+    const url = new URL(API_URL);
+    url.searchParams.append('action', action);
+    for (let key in params) url.searchParams.append(key, params[key]);
+    const res = await fetch(url);
+    return await res.json();
+  }
+
+  async function apiPost(action, data) {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' }, // Gunakan text/plain agar GAS mudah parse & hindari CORS Preflight
+      body: JSON.stringify({ action, data })
+    });
+    return await res.json();
+  }
+
+  // --- AUTH & INIT ---
+  function doShowLogin() {
+    let u = prompt("Masukkan Username:");
+    let p = prompt("Masukkan Password:");
+    if(u && p) doLogin(u, p);
+  }
+
+  async function doLogin(u, p) {
+    const res = await apiPost('login', { username: u, password: p });
+    if(res.success) {
+      currentUser = res.user;
+      localStorage.setItem('recUser', JSON.stringify(currentUser));
+      initApp();
+    } else {
+      alert(res.message);
+      doShowLogin();
+    }
+  }
+
+  function initApp() {
+    document.getElementById('greeting').innerText = `Halo, ${currentUser.name}`;
+    document.getElementById('role-display').innerText = currentUser.role;
+    document.getElementById('branch-display').innerText = currentUser.subBranchId || 'All Branches';
+    
+    // Hak Akses Navigasi
+    if(currentUser.role === 'Admin' || currentUser.role === 'GM') document.getElementById('nav-users').style.display = 'block';
+    
+    showPage('dashboard');
+  }
+
+  function logout() {
+    localStorage.removeItem('recUser');
+    currentUser = null;
+    location.reload();
+  }
+
+  // --- NAVIGATION ---
+  function showPage(page) {
+    document.querySelectorAll('[id^="page-"]').forEach(el => el.style.display = 'none');
+    document.getElementById('page-' + page).style.display = 'block';
+    
+    if(page === 'dashboard') loadDashboard();
+    if(page === 'requests') loadRequests();
+  }
+
+  // --- DASHBOARD ---
+  async function loadDashboard() {
+    const res = await apiGet('getRequests', { role: currentUser.role, subBranchId: currentUser.subBranchId, username: currentUser.username });
+    const data = res || [];
+    document.getElementById('stat-total-req').innerText = data.length;
+    document.getElementById('stat-accepted').innerText = data.reduce((s, r) => s + r.totalAccepted, 0);
+    document.getElementById('stat-remaining').innerText = data.reduce((s, r) => s + (r.qtyRequested - r.totalAccepted), 0);
+  }
+
+  // --- PERMINTAAN TK ---
+  async function loadRequests() {
+    const res = await apiGet('getRequests', { role: currentUser.role, subBranchId: currentUser.subBranchId, username: currentUser.username });
+    const tbody = document.getElementById('table-requests');
+    tbody.innerHTML = '';
+    
+    (res || []).forEach(r => {
+      tbody.innerHTML += `<tr>
+        <td>${r.requestId}</td><td>${r.siteDept}</td><td>${r.service}</td><td>${r.requestDate}</td>
+        <td class="fw-bold">${r.qtyRequested}</td><td>${r.totalMapped}</td><td class="text-success fw-bold">${r.totalAccepted}</td>
+        <td>
+          ${currentUser.role === 'PIC' ? `<button class="btn btn-sm btn-warning" onclick="openMapping('${r.requestId}')"><i class="fas fa-sitemap"></i> Map</button>` : ''}
+          ${currentUser.role === 'Recruiter' ? `<button class="btn btn-sm btn-info" onclick="openMyProgress('${r.requestId}')"><i class="fas fa-edit"></i> Update</button>` : ''}
+        </td>
+      </tr>`;
+    });
+  }
+
+  function showRequestForm() {
+    document.getElementById('form-request').reset();
+    new bootstrap.Modal(document.getElementById('modalRequest')).show();
+  }
+
+  async function submitRequest() {
+    const form = document.getElementById('form-request');
+    if(!form.checkValidity()) { form.reportValidity(); return; }
+    
+    const data = {
+      subBranchId: currentUser.subBranchId, // Otomatis ambil sub branch si PIC
+      siteType: form.siteType.value, siteDept: form.siteDept.value, requestDate: form.requestDate.value,
+      service: form.service.value, workerType: form.workerType.value, qtyRequested: form.qtyRequested.value,
+      duration: form.duration.value, createdBy: currentUser.username
+    };
+
+    const res = await apiPost('saveRequest', data);
+    if(res.success) {
+      alert('Permintaan berhasil ditambahkan!');
+      bootstrap.Modal.getInstance(document.getElementById('modalRequest')).hide();
+      loadRequests();
+    }
+  }
+
+  // --- MAPPING (PIC) ---
+  let activeRequestId = null;
+
+  async function openMapping(requestId) {
+    activeRequestId = requestId;
+    document.getElementById('map-req-id').innerText = requestId;
+    
+    // Load recruiters di sub branch yg sama
+    const users = await apiGet('getUsers');
+    const ddl = document.getElementById('ddl-recruiter');
+    ddl.innerHTML = '<option value="">-- Pilih Recruiter --</option>';
+    users.filter(u => (u.role === 'Recruiter' || u.role === 'PIC') && u.subBranchId === currentUser.subBranchId)
+         .forEach(u => ddl.innerHTML += `<option value="${u.username}">${u.name} (${u.username})</option>`);
+
+    loadMappings();
+    new bootstrap.Modal(document.getElementById('modalMapping')).show();
+  }
+
+  async function loadMappings() {
+    const res = await apiGet('getMappings', { requestId: activeRequestId });
+    const tbody = document.getElementById('table-mappings');
+    tbody.innerHTML = '';
+    (res || []).forEach(m => {
+      tbody.innerHTML += `<tr>
+        <td>${m.recruiterUsername}</td><td>${m.qtyMapped}</td>
+        <td>${m.qtyCalled}</td><td>${m.qtySent}</td><td>${m.qtyAccepted}</td>
+        <td><button class="btn btn-sm btn-primary" onclick="updateProgress('${m.mappingId}')">Update Progress</button></td>
+      </tr>`;
+    });
+  }
+
+  async function submitMapping() {
+    const form = document.getElementById('form-mapping');
+    if(!form.checkValidity()) { form.reportValidity(); return; }
+    
+    const data = { requestId: activeRequestId, recruiterUsername: form.recruiterUsername.value, qtyMapped: form.qtyMapped.value };
+    const res = await apiPost('saveMapping', data);
+    if(res.success) { loadMappings(); form.reset(); }
+  }
+
+  // --- UPDATE PROGRESS (RECRUITER/PIC) ---
+  async function updateProgress(mappingId) {
+    const called = prompt("Masukkan Jumlah Dipanggil:");
+    const sent = prompt("Masukkan Jumlah Dikirim:");
+    const accepted = prompt("Masukkan Jumlah Diterima:");
+    
+    if(called !== null && sent !== null && accepted !== null) {
+      const res = await apiPost('updateRecruiterProgress', { mappingId, qtyCalled: called, qtySent: sent, qtyAccepted: accepted });
+      if(res.success) { alert('Berhasil diupdate!'); loadMappings(); }
+    }
+  }
+
+  // Khusus Recruiter klik dari tabel
+  async function openMyProgress(requestId) {
+    activeRequestId = requestId;
+    const res = await apiGet('getMappings', { requestId });
+    const myMap = res.find(m => m.recruiterUsername === currentUser.username);
+    if(myMap) updateProgress(myMap.mappingId);
+    else alert('Data mapping tidak ditemukan!');
+  }
+</script>
+</body>
+</html>
