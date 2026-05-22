@@ -174,13 +174,19 @@
 <!-- MODAL: MAPPING RECRUITER -->
 <div id="modalMapping" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
   <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
-    <h3 class="text-lg font-semibold mb-4">Mapping Recruiter - <span id="map-req-id" class="text-blue-500"></span></h3>
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-semibold">Mapping - <span id="map-req-site" class="text-blue-500 text-base font-normal"></span></h3>
+      <button onclick="document.getElementById('modalMapping').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"><i class="fas fa-times text-xl"></i></button>
+    </div>
     
     <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-xl mb-4 border border-slate-200 dark:border-slate-600">
       <div class="grid grid-cols-3 gap-3 items-end">
         <div class="col-span-1"><label class="block text-xs font-medium mb-1">Pilih Recruiter</label><select id="ddl-recruiter" class="w-full px-3 py-2 border dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"></select></div>
-        <div class="col-span-1"><label class="block text-xs font-medium mb-1">Jumlah Mapped</label><input type="number" id="map-qty" class="w-full px-3 py-2 border dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="0"></div>
-        <div class="col-span-1"><button onclick="submitMapping()" class="w-full bg-emerald-500 text-white px-3 py-2 rounded-lg hover:bg-emerald-600 transition text-sm font-medium">Assign</button></div>
+        <div class="col-span-1">
+          <label class="block text-xs font-medium mb-1">Jumlah Mapped <span id="map-qty-info" class="text-blue-500 font-bold"></span></label>
+          <input type="number" id="map-qty" min="1" class="w-full px-3 py-2 border dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="0">
+        </div>
+        <div class="col-span-1"><button id="btn-assign-map" onclick="submitMapping()" class="w-full bg-emerald-500 text-white px-3 py-2 rounded-lg hover:bg-emerald-600 transition text-sm font-medium">Assign</button></div>
       </div>
     </div>
 
@@ -188,6 +194,10 @@
       <thead><tr class="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 uppercase tracking-wider"><th class="p-3 border-y dark:border-slate-600">Recruiter</th><th class="p-3 border-y dark:border-slate-600">Mapped</th><th class="p-3 border-y dark:border-slate-600">Dipanggil</th><th class="p-3 border-y dark:border-slate-600">Dikirim</th><th class="p-3 border-y dark:border-slate-600">Diterima</th><th class="p-3 border-y dark:border-slate-600">Aksi</th></tr></thead>
       <tbody id="table-mappings" class="divide-y divide-slate-100 dark:divide-slate-600"></tbody>
     </table>
+
+    <div class="flex justify-end mt-5">
+      <button onclick="document.getElementById('modalMapping').classList.add('hidden')" class="px-4 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition text-sm font-medium"><i class="fas fa-arrow-left mr-2"></i>Kembali</button>
+    </div>
   </div>
 </div>
 
@@ -236,8 +246,15 @@
     document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app-screen').classList.remove('hidden');
     document.getElementById('greeting').innerText = `Halo, ${currentUser.name}`;
     document.getElementById('role-display').innerText = currentUser.role;
-    document.getElementById('branch-display').innerText = currentUser.subBranchId || 'All';
-    allBranchesData = await apiGet('getBranches');
+    
+    // Logika ubah Sub Branch ID menjadi Nama
+    let displayBranch = 'All Branches';
+    if (currentUser.subBranchId) {
+      const branchInfo = allBranchesData.find(b => b.subBranchId === currentUser.subBranchId);
+      displayBranch = branchInfo ? branchInfo.subBranchName : currentUser.subBranchId;
+    }
+    document.getElementById('branch-display').innerText = displayBranch;
+
     document.getElementById('nav-users').style.display = ['Admin'].includes(currentUser.role) ? 'flex' : 'none';
     document.getElementById('btn-add-req').style.display = ['PIC', 'Admin'].includes(currentUser.role) ? 'block' : 'none';
     showPage('dashboard');
@@ -260,7 +277,10 @@
     const res = await apiGet('getRequests', { role: currentUser.role, subBranchId: currentUser.subBranchId, username: currentUser.username }); const tbody = document.getElementById('table-requests'); tbody.innerHTML = '';
     (res || []).forEach(r => {
       let act = ''; 
-      if(['PIC','Admin'].includes(currentUser.role)) act += `<button onclick="openMapping('${r.requestId}')" class="text-amber-500 hover:text-amber-700 mr-2" title="Mapping"><i class="fas fa-sitemap"></i></button>`; 
+      if(['PIC','Admin'].includes(currentUser.role)) {
+        // Menggunakan encodeURIComponent agar karakter spesial di SiteDept aman untuk dikirim ke fungsi
+        act += `<button onclick="openMapping('${r.requestId}', '${encodeURIComponent(r.siteDept)}', ${r.qtyRequested}, ${r.totalMapped})" class="text-amber-500 hover:text-amber-700 mr-2" title="Mapping"><i class="fas fa-sitemap"></i></button>`; 
+      }
       if(currentUser.role === 'Recruiter') act += `<button onclick="openMyProgress('${r.requestId}')" class="text-blue-500 hover:text-blue-700" title="Update Progress"><i class="fas fa-edit"></i></button>`;
       
       const fulfillDate = r.fulfillmentDate ? r.fulfillmentDate : '<span class="text-slate-400 dark:text-slate-500">-</span>';
@@ -272,7 +292,7 @@
         <td class="p-4">${act}</td></tr>`;
     });
   }
-
+  
   function showRequestForm() { document.getElementById('form-request').reset(); document.getElementById('modalRequest').classList.remove('hidden'); }
 
   async function submitRequest() {
@@ -283,9 +303,16 @@
   }
 
   // === MAPPING RECRUITER ===
-  async function openMapping(requestId) {
+  let activeRequestInfo = null;
+
+  async function openMapping(requestId, encodedSiteDept, qtyRequested, totalMapped) {
     activeRequestId = requestId;
-    document.getElementById('map-req-id').innerText = requestId;
+    const siteDept = decodeURIComponent(encodedSiteDept); // Decode nama site
+    
+    // Simpan info untuk validasi
+    activeRequestInfo = { qtyRequested: Number(qtyRequested), totalMapped: Number(totalMapped) };
+
+    document.getElementById('map-req-site').innerText = siteDept; // Tampilkan nama site di modal
     
     const users = await apiGet('getUsers');
     const ddl = document.getElementById('ddl-recruiter');
@@ -300,21 +327,57 @@
   async function loadMappings() {
     const res = await apiGet('getMappings', { requestId: activeRequestId });
     const tbody = document.getElementById('table-mappings'); tbody.innerHTML = '';
+    
+    let currentTotalMapped = 0;
     res.forEach(m => {
+      currentTotalMapped += Number(m.qtyMapped);
       tbody.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
         <td class="p-3 font-medium">${m.recruiterUsername}</td><td class="p-3">${m.qtyMapped}</td><td class="p-3">${m.qtyCalled}</td><td class="p-3">${m.qtySent}</td><td class="p-3 text-emerald-500 font-bold">${m.qtyAccepted}</td>
         <td class="p-3"><button onclick="updateProgress('${m.mappingId}')" class="text-blue-500 hover:text-blue-700"><i class="fas fa-edit"></i></button></td>
       </tr>`;
     });
+
+    // Hitung sisa kebutuhan yang bisa dimapping
+    const qtyRequested = activeRequestInfo ? activeRequestInfo.qtyRequested : 0;
+    const remainingQty = qtyRequested - currentTotalMapped;
+
+    const mapQtyInput = document.getElementById('map-qty');
+    const mapQtyInfo = document.getElementById('map-qty-info');
+    const assignBtn = document.getElementById('btn-assign-map');
+
+    if (remainingQty <= 0) {
+      mapQtyInput.max = 0;
+      mapQtyInput.placeholder = "Penuh";
+      mapQtyInfo.innerText = `(Penuh: ${qtyRequested}/${qtyRequested})`;
+      assignBtn.disabled = true;
+      assignBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    } else {
+      mapQtyInput.max = remainingQty;
+      mapQtyInput.placeholder = `Max ${remainingQty}`;
+      mapQtyInfo.innerText = `(Sisa: ${remainingQty})`;
+      assignBtn.disabled = false;
+      assignBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
   }
 
   async function submitMapping() {
-    const recruiter = document.getElementById('ddl-recruiter').value; const qty = document.getElementById('map-qty').value;
+    const recruiter = document.getElementById('ddl-recruiter').value; 
+    const qty = Number(document.getElementById('map-qty').value);
+    const maxQty = Number(document.getElementById('map-qty').max);
+    
     if(!recruiter || !qty) return alert('Pilih recruiter dan isi jumlah!');
-    const res = await apiPost('saveMapping', { requestId: activeRequestId, recruiterUsername: recruiter, qtyMapped: qty });
-    if(res.success) { document.getElementById('ddl-recruiter').value=''; document.getElementById('map-qty').value=''; loadMappings(); }
-  }
+    if(qty > maxQty) return alert(`Jumlah melebihi sisa kebutuhan! Maksimal ${maxQty}.`);
+    if(qty <= 0) return alert('Jumlah harus lebih dari 0!');
 
+    const res = await apiPost('saveMapping', { requestId: activeRequestId, recruiterUsername: recruiter, qtyMapped: qty });
+    if(res.success) { 
+      document.getElementById('ddl-recruiter').value=''; 
+      document.getElementById('map-qty').value=''; 
+      loadMappings(); // Refresh tabel dan validasi limit
+      loadRequests(); // Refresh tabel permintaan utama
+    }
+  }
+  
   async function updateProgress(mappingId) {
     const c = prompt("Jumlah Dipanggil:"); if(c===null) return;
     const s = prompt("Jumlah Dikirim:"); if(s===null) return;
