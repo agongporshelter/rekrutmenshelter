@@ -134,9 +134,40 @@
     <h3 class="text-lg font-semibold mb-4">Ubah Password Anda</h3>
     <div id="chpass-error" class="hidden bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-300 p-3 rounded-lg text-sm mb-3"></div>
     <div class="space-y-4">
-      <div><label class="block text-sm font-medium mb-1">Password Lama</label><input type="password" id="ch-oldpass" class="w-full px-3 py-2 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none" required></div>
-      <div><label class="block text-sm font-medium mb-1">Password Baru</label><input type="password" id="ch-newpass" class="w-full px-3 py-2 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none" required></div>
-      <div><label class="block text-sm font-medium mb-1">Konfirmasi Password Baru</label><input type="password" id="ch-confpass" class="w-full px-3 py-2 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none" required></div>
+      
+      <!-- Password Lama -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Password Lama</label>
+        <div class="relative">
+          <input type="password" id="ch-oldpass" class="w-full px-3 py-2 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none pr-10" required>
+          <button type="button" onclick="togglePass('ch-oldpass', 'eye-ch-old')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+            <i id="eye-ch-old" class="fas fa-eye-slash"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Password Baru -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Password Baru</label>
+        <div class="relative">
+          <input type="password" id="ch-newpass" class="w-full px-3 py-2 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none pr-10" required>
+          <button type="button" onclick="togglePass('ch-newpass', 'eye-ch-new')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+            <i id="eye-ch-new" class="fas fa-eye-slash"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Konfirmasi Password Baru -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Konfirmasi Password Baru</label>
+        <div class="relative">
+          <input type="password" id="ch-confpass" class="w-full px-3 py-2 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none pr-10" required>
+          <button type="button" onclick="togglePass('ch-confpass', 'eye-ch-conf')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+            <i id="eye-ch-conf" class="fas fa-eye-slash"></i>
+          </button>
+        </div>
+      </div>
+
     </div>
     <div class="flex justify-end gap-2 pt-5">
       <button onclick="document.getElementById('modalChangePass').classList.add('hidden')" class="px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition">Batal</button>
@@ -144,7 +175,7 @@
     </div>
   </div>
 </div>
-
+  
 <!-- MODAL: FORM PERMINTAAN TK -->
 <div id="modalRequest" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
   <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
