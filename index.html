@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: { sans: ['Inter', 'sans-serif'] },
@@ -21,18 +22,25 @@
     body { font-family: 'Inter', sans-serif; }
     .fade-in { animation: fadeIn 0.3s ease-in-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    /* Logo putih menggunakan filter CSS agar tidak perlu file terpisah */
+    .dark #logo-img { filter: brightness(0) invert(1); }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300">
 
-<!-- GANTI DENGAN URL GOOGLE APPS SCRIPT ANDA -->
 <script>const API_URL = 'https://script.google.com/macros/s/AKfycbyqp5tiSFgZ9znvHYQVOfTqmyVGLD29LllSZ3_bcjQNiFna_SV8yQPXPIaJTAVXe1ma/exec';</script>
 
+<!-- Logo URL Biru (Ganti jika perlu) -->
+<script>const LOGO_URL = 'https://z-cdn-media.chatglm.cn/files/9ab8b65d-de87-449b-9845-24c41f373e1f.png?auth_key=1879420257-135c21a55bff4f31ac827b7562066617-0-8ae8d40b686c9d116cba7976e1803a8f';</script>
+
 <!-- HALAMAN LOGIN -->
-<div id="login-screen" class="min-h-screen flex items-center justify-center bg-slate-900">
+<div id="login-screen" class="min-h-screen flex items-center justify-center bg-slate-900 dark:bg-black">
   <div class="w-full max-w-md p-8 bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10">
-    <h2 class="text-3xl font-bold text-white mb-2 text-center">Monitoring</h2>
-    <p class="text-slate-400 text-center mb-8">Rekrutmen TK</p>
+    <div class="flex flex-col items-center mb-6">
+      <img src="${LOGO_URL}" id="logo-img-login" class="h-10 mb-3" alt="Logo">
+      <h2 class="text-3xl font-bold text-white tracking-tight">MONITORING</h2>
+      <p class="text-slate-400 text-sm">Rekrutmen TK</p>
+    </div>
     <div id="login-error" class="hidden bg-red-500/10 text-red-400 p-3 rounded-lg text-sm mb-4"></div>
     <div class="mb-5">
       <label class="block text-slate-300 text-sm font-medium mb-2">Username</label>
@@ -42,9 +50,7 @@
       <label class="block text-slate-300 text-sm font-medium mb-2">Password</label>
       <div class="relative">
         <input type="password" id="login-password" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition pr-10" placeholder="Masukkan password">
-        <button type="button" onclick="togglePass('login-password', 'eye-login')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white">
-          <i id="eye-login" class="fas fa-eye-slash"></i>
-        </button>
+        <button type="button" onclick="togglePass('login-password', 'eye-login')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white"><i id="eye-login" class="fas fa-eye-slash"></i></button>
       </div>
     </div>
     <button onclick="doLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition duration-300">LOGIN</button>
@@ -55,82 +61,85 @@
 <div id="app-screen" class="hidden flex h-screen overflow-hidden">
   
   <!-- SIDEBAR -->
-  <aside class="w-64 bg-white border-r border-slate-200 flex flex-col">
-    <div class="p-6 border-b border-slate-100">
-      <h1 class="text-xl font-bold text-slate-800 tracking-tight">Rekrutmen</h1>
-      <p class="text-xs text-slate-400 mt-1">Management System</p>
+  <aside class="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col transition-colors duration-300">
+    <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex flex-col items-center">
+      <img src="${LOGO_URL}" id="logo-img-sidebar" class="h-8 mb-2" alt="Logo">
+      <h1 class="text-xl font-bold tracking-tight">MONITORING</h1>
     </div>
     <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
-      <a href="#" onclick="showPage('dashboard')" id="nav-dashboard" class="nav-link flex items-center px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition"><i class="fas fa-chart-pie w-5 mr-3 text-slate-400"></i> Dashboard</a>
-      <a href="#" onclick="showPage('requests')" id="nav-requests" class="nav-link flex items-center px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition"><i class="fas fa-file-alt w-5 mr-3 text-slate-400"></i> Permintaan TK</a>
-      <a href="#" onclick="showPage('branches')" id="nav-branches" class="nav-link flex items-center px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition"><i class="fas fa-code-branch w-5 mr-3 text-slate-400"></i> Kelola Branch</a>
-      <a href="#" onclick="showPage('users')" id="nav-users" class="nav-link flex items-center px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition"><i class="fas fa-users-cog w-5 mr-3 text-slate-400"></i> Manajemen User</a>
+      <a href="#" onclick="showPage('dashboard')" id="nav-dashboard" class="nav-link flex items-center px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fas fa-chart-pie w-5 mr-3 text-slate-400"></i> Dashboard</a>
+      <a href="#" onclick="showPage('requests')" id="nav-requests" class="nav-link flex items-center px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fas fa-file-alt w-5 mr-3 text-slate-400"></i> Permintaan TK</a>
+      <a href="#" onclick="showPage('users')" id="nav-users" class="nav-link flex items-center px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fas fa-users-cog w-5 mr-3 text-slate-400"></i> Manajemen User</a>
     </nav>
-    <div class="p-4 border-t border-slate-100 space-y-1">
-      <button onclick="showChangePasswordModal()" class="w-full flex items-center px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition">
-        <i class="fas fa-key w-5 mr-3 text-slate-400"></i> Ubah Password
-      </button>
-      <button onclick="logout()" class="w-full flex items-center px-4 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition">
-        <i class="fas fa-sign-out-alt w-5 mr-3"></i> Logout
-      </button>
+    <div class="p-4 border-t border-slate-100 dark:border-slate-700 space-y-1">
+      <button onclick="showChangePasswordModal()" class="w-full flex items-center px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fas fa-key w-5 mr-3 text-slate-400"></i> Ubah Password</button>
+      <button onclick="logout()" class="w-full flex items-center px-4 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition"><i class="fas fa-sign-out-alt w-5 mr-3"></i> Logout</button>
     </div>
   </aside>
 
   <!-- MAIN CONTENT -->
-  <main class="flex-1 overflow-y-auto bg-slate-50 p-8">
+  <main class="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-900 p-8 transition-colors duration-300">
+    
     <div class="flex justify-between items-center mb-8">
       <div>
-        <h2 class="text-2xl font-bold text-slate-800" id="greeting">Selamat Datang</h2>
+        <h2 class="text-2xl font-bold" id="greeting">Selamat Datang</h2>
         <div class="flex gap-2 mt-1">
-          <span class="px-2 py-1 text-xs font-semibold rounded-md bg-blue-100 text-blue-700" id="role-display"></span>
-          <span class="px-2 py-1 text-xs font-semibold rounded-md bg-slate-100 text-slate-700" id="branch-display"></span>
+          <span class="px-2 py-1 text-xs font-semibold rounded-md bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300" id="role-display"></span>
+          <span class="px-2 py-1 text-xs font-semibold rounded-md bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300" id="branch-display"></span>
         </div>
       </div>
+      <!-- TOMBOL TOGGLE DARK MODE -->
+      <button onclick="toggleDarkMode()" id="btn-theme" class="p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition text-yellow-500 dark:text-slate-300">
+        <i class="fas fa-moon" id="theme-icon"></i>
+      </button>
     </div>
 
     <!-- PAGE: DASHBOARD -->
     <div id="page-dashboard" class="content-page fade-in">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm"><p class="text-sm text-slate-500 mb-1">Total Permintaan</p><h3 class="text-3xl font-bold text-slate-800" id="stat-total-req">0</h3></div>
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm"><p class="text-sm text-slate-500 mb-1">Kandidat Diterima</p><h3 class="text-3xl font-bold text-emerald-500" id="stat-accepted">0</h3></div>
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm"><p class="text-sm text-slate-500 mb-1">Sisa Kebutuhan</p><h3 class="text-3xl font-bold text-amber-500" id="stat-remaining">0</h3></div>
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm"><p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Total Permintaan</p><h3 class="text-3xl font-bold" id="stat-total-req">0</h3></div>
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm"><p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Kandidat Diterima</p><h3 class="text-3xl font-bold text-emerald-500" id="stat-accepted">0</h3></div>
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm"><p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Sisa Kebutuhan</p><h3 class="text-3xl font-bold text-amber-500" id="stat-remaining">0</h3></div>
       </div>
     </div>
 
     <!-- PAGE: PERMINTAAN TK -->
     <div id="page-requests" class="content-page hidden fade-in">
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="p-5 border-b border-slate-100 flex justify-between items-center">
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
           <h3 class="font-semibold text-lg">Daftar Permintaan</h3>
           <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition hidden" id="btn-add-req" onclick="showRequestForm()"><i class="fas fa-plus mr-2"></i>Tambah Permintaan</button>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
-            <thead><tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider"><th class="p-4 border-y">Site/Bagian</th><th class="p-4 border-y">Layanan</th><th class="p-4 border-y">Tanggal</th><th class="p-4 border-y">Qty Req</th><th class="p-4 border-y">Mapped</th><th class="p-4 border-y">Diterima</th><th class="p-4 border-y">Aksi</th></tr></thead>
-            <tbody id="table-requests" class="divide-y divide-slate-100"></tbody>
+            <thead>
+              <tr class="bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-300 text-xs uppercase tracking-wider">
+                <th class="p-4 border-y dark:border-slate-600">Site/Bagian</th><th class="p-4 border-y dark:border-slate-600">Layanan</th><th class="p-4 border-y dark:border-slate-600">Tgl Permintaan</th><th class="p-4 border-y dark:border-slate-600">Qty Req</th><th class="p-4 border-y dark:border-slate-600">Diterima</th><th class="p-4 border-y dark:border-slate-600">Tgl Pemenuhan</th><th class="p-4 border-y dark:border-slate-600">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="table-requests" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- PAGE: BRANCH & USER (Disembunyikan default, logic ada di kode sebelumnya) -->
-    <div id="page-branches" class="content-page hidden fade-in"><div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5"><h3 class="font-semibold text-lg mb-4">Struktur Branch (UI Sama seperti sebelumnya)</h3><p class="text-sm text-slate-500">Fitur branch sudah terintegrasi.</p></div></div>
-    <div id="page-users" class="content-page hidden fade-in"><div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5"><h3 class="font-semibold text-lg mb-4">Manajemen User (UI Sama seperti sebelumnya)</h3><p class="text-sm text-slate-500">Fitur user sudah terintegrasi.</p></div></div>
+    <!-- PAGE: MANAJEMEN USER -->
+    <div id="page-users" class="content-page hidden fade-in"><div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-5"><h3 class="font-semibold text-lg">Manajemen User</h3></div></div>
   </main>
 </div>
 
 <!-- MODAL: UBAH PASSWORD -->
 <div id="modalChangePass" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-6">
     <h3 class="text-lg font-semibold mb-4">Ubah Password Anda</h3>
-    <div id="chpass-error" class="hidden bg-red-50 text-red-500 p-3 rounded-lg text-sm mb-3"></div>
+    <div id="chpass-error" class="hidden bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-300 p-3 rounded-lg text-sm mb-3"></div>
     <div class="space-y-4">
-      <div><label class="block text-sm font-medium text-slate-700 mb-1">Password Lama</label><input type="password" id="ch-oldpass" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required></div>
-      <div><label class="block text-sm font-medium text-slate-700 mb-1">Password Baru</label><input type="password" id="ch-newpass" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required></div>
-      <div><label class="block text-sm font-medium text-slate-700 mb-1">Konfirmasi Password Baru</label><input type="password" id="ch-confpass" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required></div>
+      <div><label class="block text-sm font-medium mb-1">Password Lama</label><input type="password" id="ch-oldpass" class="w-full px-3 py-2 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none" required></div>
+      <div><label class="block text-sm font-medium mb-1">Password Baru</label><input type="password" id="ch-newpass" class="w-full px-3 py-2 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none" required></div>
+      <div><label class="block text-sm font-medium mb-1">Konfirmasi Password Baru</label><input type="password" id="ch-confpass" class="w-full px-3 py-2 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none" required></div>
     </div>
     <div class="flex justify-end gap-2 pt-5">
-      <button onclick="document.getElementById('modalChangePass').classList.add('hidden')" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition">Batal</button>
+      <button onclick="document.getElementById('modalChangePass').classList.add('hidden')" class="px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition">Batal</button>
       <button onclick="submitChangePassword()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Simpan</button>
     </div>
   </div>
@@ -138,71 +147,81 @@
 
 <!-- MODAL: FORM PERMINTAAN TK -->
 <div id="modalRequest" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-  <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
     <h3 class="text-lg font-semibold mb-4">Form Permintaan TK</h3>
     <form id="form-request" class="space-y-4">
       <div class="grid grid-cols-2 gap-4">
-        <div><label class="block text-sm font-medium text-slate-700 mb-1">Jenis Site</label><select name="siteType" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required><option value="New">New</option><option value="Existing">Existing</option></select></div>
-        <div><label class="block text-sm font-medium text-slate-700 mb-1">Tanggal Permintaan</label><input type="date" name="requestDate" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required></div>
+        <div><label class="block text-sm font-medium mb-1">Jenis Site</label><select name="siteType" class="w-full px-3 py-2 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none" required><option value="New">New</option><option value="Existing">Existing</option></select></div>
+        <div><label class="block text-sm font-medium mb-1">Tanggal Permintaan</label><input type="date" name="requestDate" class="w-full px-3 py-2 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none" required></div>
       </div>
-      <div><label class="block text-sm font-medium text-slate-700 mb-1">Nama Site - Bagian</label><input type="text" name="siteDept" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="cth: PT ABC - Security Gudang" required></div>
+      <div><label class="block text-sm font-medium mb-1">Nama Site - Bagian</label><input type="text" name="siteDept" class="w-full px-3 py-2 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="cth: PT ABC - Security Gudang" required></div>
       <div class="grid grid-cols-2 gap-4">
-        <div><label class="block text-sm font-medium text-slate-700 mb-1">Layanan</label><select name="service" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required><option value="Security">Security</option><option value="Labor">Labor</option><option value="Cleaning">Cleaning</option><option value="Logistic">Logistic</option></select></div>
-        <div><label class="block text-sm font-medium text-slate-700 mb-1">Jenis TK</label><select name="workerType" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required><option value="Reguler">Reguler</option><option value="Casual">Casual</option></select></div>
+        <div><label class="block text-sm font-medium mb-1">Layanan</label><select name="service" class="w-full px-3 py-2 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none" required><option value="Security">Security</option><option value="Labor">Labor</option><option value="Cleaning">Cleaning</option><option value="Logistic">Logistic</option></select></div>
+        <div><label class="block text-sm font-medium mb-1">Jenis TK</label><select name="workerType" class="w-full px-3 py-2 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none" required><option value="Reguler">Reguler</option><option value="Casual">Casual</option></select></div>
       </div>
       <div class="grid grid-cols-2 gap-4">
-        <div><label class="block text-sm font-medium text-slate-700 mb-1">Jumlah TK (Qty)</label><input type="number" name="qtyRequested" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required></div>
-        <div><label class="block text-sm font-medium text-slate-700 mb-1">Durasi Pemenuhan</label><input type="text" name="duration" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="cth: 7 Hari" required></div>
+        <div><label class="block text-sm font-medium mb-1">Jumlah TK (Qty)</label><input type="number" name="qtyRequested" class="w-full px-3 py-2 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none" required></div>
+        <div><label class="block text-sm font-medium mb-1">Durasi Pemenuhan</label><input type="text" name="duration" class="w-full px-3 py-2 border dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="cth: 7 Hari" required></div>
       </div>
     </form>
     <div class="flex justify-end gap-2 pt-5">
-      <button onclick="document.getElementById('modalRequest').classList.add('hidden')" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition">Batal</button>
+      <button onclick="document.getElementById('modalRequest').classList.add('hidden')" class="px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition">Batal</button>
       <button onclick="submitRequest()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Simpan Permintaan</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL: FORM USER (Dengan toggle password) -->
-<div id="modalUser" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
-    <h3 class="text-lg font-semibold mb-4" id="user-form-title">Tambah User</h3>
-    <form id="form-user" class="space-y-3">
-      <input type="hidden" name="id" id="user-id">
-      <div><label class="block text-sm font-medium text-slate-700">Nama</label><input type="text" name="name" class="mt-1 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required></div>
-      <div><label class="block text-sm font-medium text-slate-700">Username</label><input type="text" name="username" id="user-username" class="mt-1 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required></div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700">Password</label>
-        <div class="relative mt-1">
-          <input type="password" name="password" id="user-password" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none pr-10" required>
-          <button type="button" onclick="togglePass('user-password', 'eye-user')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"><i id="eye-user" class="fas fa-eye-slash"></i></button>
-        </div>
+<!-- MODAL: MAPPING RECRUITER -->
+<div id="modalMapping" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
+    <h3 class="text-lg font-semibold mb-4">Mapping Recruiter - <span id="map-req-id" class="text-blue-500"></span></h3>
+    
+    <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-xl mb-4 border border-slate-200 dark:border-slate-600">
+      <div class="grid grid-cols-3 gap-3 items-end">
+        <div class="col-span-1"><label class="block text-xs font-medium mb-1">Pilih Recruiter</label><select id="ddl-recruiter" class="w-full px-3 py-2 border dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"></select></div>
+        <div class="col-span-1"><label class="block text-xs font-medium mb-1">Jumlah Mapped</label><input type="number" id="map-qty" class="w-full px-3 py-2 border dark:border-slate-500 rounded-lg bg-white dark:bg-slate-600 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" placeholder="0"></div>
+        <div class="col-span-1"><button onclick="submitMapping()" class="w-full bg-emerald-500 text-white px-3 py-2 rounded-lg hover:bg-emerald-600 transition text-sm font-medium">Assign</button></div>
       </div>
-      <div><label class="block text-sm font-medium text-slate-700">Role</label><select name="role" id="user-role" onchange="handleRoleChange()" class="mt-1 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required><option value="">-- Pilih --</option><option value="Admin">Admin</option><option value="GM">GM</option><option value="BM">BM</option><option value="PIC">PIC</option><option value="Recruiter">Recruiter</option></select></div>
-      <div id="field-branch" class="hidden"><label class="block text-sm font-medium text-slate-700">Branch</label><select name="branchId" id="user-branch" onchange="handleBranchChange()" class="mt-1 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></select></div>
-      <div id="field-subbranch" class="hidden"><label class="block text-sm font-medium text-slate-700">Sub Branch</label><select name="subBranchId" id="user-subbranch" class="mt-1 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></select></div>
-      <div class="flex justify-end gap-2 pt-2"><button type="button" onclick="closeUserModal()" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition">Batal</button><button type="button" onclick="submitUser()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Simpan</button></div>
-    </form>
+    </div>
+
+    <table class="w-full text-left border-collapse text-sm">
+      <thead><tr class="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 uppercase tracking-wider"><th class="p-3 border-y dark:border-slate-600">Recruiter</th><th class="p-3 border-y dark:border-slate-600">Mapped</th><th class="p-3 border-y dark:border-slate-600">Dipanggil</th><th class="p-3 border-y dark:border-slate-600">Dikirim</th><th class="p-3 border-y dark:border-slate-600">Diterima</th><th class="p-3 border-y dark:border-slate-600">Aksi</th></tr></thead>
+      <tbody id="table-mappings" class="divide-y divide-slate-100 dark:divide-slate-600"></tbody>
+    </table>
   </div>
 </div>
 
 <script>
   let currentUser = JSON.parse(localStorage.getItem('recUser')) || null;
   let allBranchesData = []; 
-  
-  window.onload = () => { currentUser ? initApp() : showLoginScreen(); };
+  let activeRequestId = null;
+
+  window.onload = () => { loadTheme(); currentUser ? initApp() : showLoginScreen(); };
 
   async function apiGet(action, params = {}) { const url = new URL(API_URL); url.searchParams.append('action', action); for (let key in params) url.searchParams.append(key, params[key]); try { const res = await fetch(url.toString(), {redirect: 'follow'}); return await res.json(); } catch (error) { return []; } }
   async function apiPost(action, data) { try { const res = await fetch(API_URL, { method: 'POST', headers: {'Content-Type': 'text/plain'}, body: JSON.stringify({ action, data }), redirect: 'follow' }); return await res.json(); } catch (error) { return { success: false, message: "Koneksi server gagal!" }; } }
 
-  function showLoginScreen() { document.getElementById('login-screen').classList.remove('hidden'); document.getElementById('app-screen').classList.add('hidden'); }
-  
-  // Toggle Password
-  function togglePass(inputId, iconId) {
-    const input = document.getElementById(inputId);
-    const icon = document.getElementById(iconId);
-    if (input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye-slash', 'fa-eye'); }
-    else { input.type = 'password'; icon.classList.replace('fa-eye', 'fa-eye-slash'); }
+  // === DARK MODE & LOGO LOGIC ===
+  function loadTheme() {
+    const isDark = localStorage.getItem('theme') === 'dark';
+    if (isDark) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+    updateThemeIcon();
   }
+  function toggleDarkMode() {
+    document.documentElement.classList.toggle('dark');
+    const isDark = document.documentElement.classList.contains('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    updateThemeIcon();
+  }
+  function updateThemeIcon() {
+    const isDark = document.documentElement.classList.contains('dark');
+    document.getElementById('theme-icon').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+  }
+
+  function togglePass(inputId, iconId) { const input = document.getElementById(inputId); const icon = document.getElementById(iconId); if (input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye-slash', 'fa-eye'); } else { input.type = 'password'; icon.classList.replace('fa-eye', 'fa-eye-slash'); } }
+
+  function showLoginScreen() { document.getElementById('login-screen').classList.remove('hidden'); document.getElementById('app-screen').classList.add('hidden'); }
 
   async function doLogin() {
     const u = document.getElementById('login-username').value; const p = document.getElementById('login-password').value;
@@ -220,7 +239,6 @@
     document.getElementById('branch-display').innerText = currentUser.subBranchId || 'All';
     allBranchesData = await apiGet('getBranches');
     document.getElementById('nav-users').style.display = ['Admin'].includes(currentUser.role) ? 'flex' : 'none';
-    document.getElementById('nav-branches').style.display = ['Admin', 'GM'].includes(currentUser.role) ? 'flex' : 'none';
     document.getElementById('btn-add-req').style.display = ['PIC', 'Admin'].includes(currentUser.role) ? 'block' : 'none';
     showPage('dashboard');
   }
@@ -230,8 +248,8 @@
   function showPage(page) {
     document.querySelectorAll('.content-page').forEach(el => el.classList.add('hidden'));
     document.getElementById('page-' + page).classList.remove('hidden');
-    document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('bg-slate-100', 'text-slate-900'));
-    const navEl = document.getElementById('nav-' + page); if(navEl) navEl.classList.add('bg-slate-100', 'text-slate-900');
+    document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('bg-slate-100', 'dark:bg-slate-700', 'text-slate-900', 'dark:text-white'));
+    const navEl = document.getElementById('nav-' + page); if(navEl) navEl.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-900', 'dark:text-white');
     if(page === 'dashboard') loadDashboard(); if(page === 'requests') loadRequests();
   }
 
@@ -241,42 +259,89 @@
   async function loadRequests() {
     const res = await apiGet('getRequests', { role: currentUser.role, subBranchId: currentUser.subBranchId, username: currentUser.username }); const tbody = document.getElementById('table-requests'); tbody.innerHTML = '';
     (res || []).forEach(r => {
-      let act = ''; if(['PIC','Admin'].includes(currentUser.role)) act += `<button onclick="alert('Mapping: ${r.requestId}')" class="text-amber-500 hover:text-amber-700 mr-2" title="Mapping"><i class="fas fa-sitemap"></i></button>`; if(currentUser.role === 'Recruiter') act += `<button onclick="alert('Update: ${r.requestId}')" class="text-blue-500 hover:text-blue-700" title="Update Progress"><i class="fas fa-edit"></i></button>`;
-      tbody.innerHTML += `<tr class="hover:bg-slate-50"><td class="p-4 font-medium">${r.siteDept}</td><td class="p-4 text-slate-500">${r.service}</td><td class="p-4 text-slate-500">${r.requestDate}</td><td class="p-4 font-bold">${r.qtyRequested}</td><td class="p-4">${r.totalMapped}</td><td class="p-4 text-emerald-500 font-bold">${r.totalAccepted}</td><td class="p-4">${act}</td></tr>`;
+      let act = ''; 
+      if(['PIC','Admin'].includes(currentUser.role)) act += `<button onclick="openMapping('${r.requestId}')" class="text-amber-500 hover:text-amber-700 mr-2" title="Mapping"><i class="fas fa-sitemap"></i></button>`; 
+      if(currentUser.role === 'Recruiter') act += `<button onclick="openMyProgress('${r.requestId}')" class="text-blue-500 hover:text-blue-700" title="Update Progress"><i class="fas fa-edit"></i></button>`;
+      
+      const fulfillDate = r.fulfillmentDate ? r.fulfillmentDate : '<span class="text-slate-400 dark:text-slate-500">-</span>';
+      
+      tbody.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+        <td class="p-4 font-medium">${r.siteDept}</td><td class="p-4 text-slate-500 dark:text-slate-400">${r.service}</td><td class="p-4 text-slate-500 dark:text-slate-400">${r.requestDate}</td>
+        <td class="p-4 font-bold">${r.qtyRequested}</td><td class="p-4 text-emerald-500 font-bold">${r.totalAccepted}</td>
+        <td class="p-4 text-xs font-semibold ${r.fulfillmentDate ? 'text-emerald-600 dark:text-emerald-400' : ''}">${fulfillDate}</td>
+        <td class="p-4">${act}</td></tr>`;
     });
   }
 
   function showRequestForm() { document.getElementById('form-request').reset(); document.getElementById('modalRequest').classList.remove('hidden'); }
 
   async function submitRequest() {
-    const form = document.getElementById('form-request');
-    if(!form.checkValidity()) { form.reportValidity(); return; }
-    const data = {
-      subBranchId: currentUser.subBranchId, siteType: form.siteType.value, siteDept: form.siteDept.value, requestDate: form.requestDate.value,
-      service: form.service.value, workerType: form.workerType.value, qtyRequested: form.qtyRequested.value,
-      duration: form.duration.value, createdBy: currentUser.username
-    };
+    const form = document.getElementById('form-request'); if(!form.checkValidity()) { form.reportValidity(); return; }
+    const data = { subBranchId: currentUser.subBranchId, siteType: form.siteType.value, siteDept: form.siteDept.value, requestDate: form.requestDate.value, service: form.service.value, workerType: form.workerType.value, qtyRequested: form.qtyRequested.value, duration: form.duration.value, createdBy: currentUser.username };
     const res = await apiPost('saveRequest', data);
-    if(res.success) { document.getElementById('modalRequest').classList.add('hidden'); loadRequests(); alert('Permintaan berhasil ditambahkan!'); }
-    else { alert(res.message || 'Gagal menyimpan'); }
+    if(res.success) { document.getElementById('modalRequest').classList.add('hidden'); loadRequests(); } else { alert(res.message || 'Gagal menyimpan'); }
+  }
+
+  // === MAPPING RECRUITER ===
+  async function openMapping(requestId) {
+    activeRequestId = requestId;
+    document.getElementById('map-req-id').innerText = requestId;
+    
+    const users = await apiGet('getUsers');
+    const ddl = document.getElementById('ddl-recruiter');
+    ddl.innerHTML = '<option value="">-- Pilih Recruiter --</option>';
+    users.filter(u => (u.role === 'Recruiter' || u.role === 'PIC') && u.subBranchId === currentUser.subBranchId)
+         .forEach(u => ddl.innerHTML += `<option value="${u.username}">${u.name} (${u.username})</option>`);
+    
+    await loadMappings();
+    document.getElementById('modalMapping').classList.remove('hidden');
+  }
+
+  async function loadMappings() {
+    const res = await apiGet('getMappings', { requestId: activeRequestId });
+    const tbody = document.getElementById('table-mappings'); tbody.innerHTML = '';
+    res.forEach(m => {
+      tbody.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+        <td class="p-3 font-medium">${m.recruiterUsername}</td><td class="p-3">${m.qtyMapped}</td><td class="p-3">${m.qtyCalled}</td><td class="p-3">${m.qtySent}</td><td class="p-3 text-emerald-500 font-bold">${m.qtyAccepted}</td>
+        <td class="p-3"><button onclick="updateProgress('${m.mappingId}')" class="text-blue-500 hover:text-blue-700"><i class="fas fa-edit"></i></button></td>
+      </tr>`;
+    });
+  }
+
+  async function submitMapping() {
+    const recruiter = document.getElementById('ddl-recruiter').value; const qty = document.getElementById('map-qty').value;
+    if(!recruiter || !qty) return alert('Pilih recruiter dan isi jumlah!');
+    const res = await apiPost('saveMapping', { requestId: activeRequestId, recruiterUsername: recruiter, qtyMapped: qty });
+    if(res.success) { document.getElementById('ddl-recruiter').value=''; document.getElementById('map-qty').value=''; loadMappings(); }
+  }
+
+  async function updateProgress(mappingId) {
+    const c = prompt("Jumlah Dipanggil:"); if(c===null) return;
+    const s = prompt("Jumlah Dikirim:"); if(s===null) return;
+    const a = prompt("Jumlah Diterima:"); if(a===null) return;
+    const res = await apiPost('updateRecruiterProgress', { mappingId, qtyCalled: c, qtySent: s, qtyAccepted: a });
+    if(res.success) { alert('Berhasil diupdate!'); loadMappings(); loadRequests(); }
+  }
+
+  async function openMyProgress(requestId) {
+    activeRequestId = requestId;
+    const res = await apiGet('getMappings', { requestId });
+    const myMap = res.find(m => m.recruiterUsername === currentUser.username);
+    if(myMap) updateProgress(myMap.mappingId);
+    else alert('Anda belum di-mapping untuk permintaan ini.');
   }
 
   // === UBAH PASSWORD ===
   function showChangePasswordModal() { document.getElementById('ch-oldpass').value=''; document.getElementById('ch-newpass').value=''; document.getElementById('ch-confpass').value=''; document.getElementById('chpass-error').classList.add('hidden'); document.getElementById('modalChangePass').classList.remove('hidden'); }
-  
   async function submitChangePassword() {
     const oldP = document.getElementById('ch-oldpass').value; const newP = document.getElementById('ch-newpass').value; const confP = document.getElementById('ch-confpass').value;
     const errDiv = document.getElementById('chpass-error');
     if(!oldP || !newP || !confP) { errDiv.textContent="Semua field wajib diisi"; errDiv.classList.remove('hidden'); return; }
     if(newP !== confP) { errDiv.textContent="Password baru dan konfirmasi tidak cocok!"; errDiv.classList.remove('hidden'); return; }
-    
     const res = await apiPost('changePassword', { username: currentUser.username, oldPassword: oldP, newPassword: newP });
     if(res.success) { alert('Password berhasil diubah!'); document.getElementById('modalChangePass').classList.add('hidden'); }
     else { errDiv.textContent = res.message; errDiv.classList.remove('hidden'); }
   }
-
-  // === MANAJEMEN USER (Dengan Toggle) ===
-  // (Fungsi loadUsers, showUserForm, dll tetap sama seperti kode sebelumnya, pastikan modalUser di html sudah disesuaikan)
 </script>
 </body>
 </html>
