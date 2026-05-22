@@ -54,8 +54,27 @@
 </div>
 
 <!-- HALAMAN UTAMA APLIKASI -->
-<div id="app-screen" class="hidden flex h-screen overflow-hidden">
+<div id="app-screen" class="hidden flex flex-col md:flex-row h-screen overflow-hidden">
   
+  <!-- TOP BAR MOBILE (Hanya muncul di HP) -->
+  <header class="md:hidden bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-4 flex justify-between items-center sticky top-0 z-10">
+    <div class="flex items-center gap-3">
+      <button onclick="toggleSidebar()" class="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
+        <i class="fas fa-bars text-xl"></i>
+      </button>
+      <div class="flex items-center gap-2">
+        <img src="https://z-cdn-media.chatglm.cn/files/9ab8b65d-de87-449b-9845-24c41f373e1f.png?auth_key=1879420257-135c21a55bff4f31ac827b7562066617-0-8ae8d40b686c9d116cba7976e1803a8f" class="h-6 dark:hidden" alt="Logo">
+        <img src="https://z-cdn-media.chatglm.cn/files/ff3c9e26-bde6-4813-8822-2940cf90d57d.png?auth_key=1879420840-aee87e506836431d895e946fa7b16291-0-cdb68064fa5da0e586c638cc0207ea0e" class="h-6 hidden dark:block" alt="Logo">
+        <h1 class="font-bold tracking-tight text-sm">MONITORING</h1>
+      </div>
+    </div>
+    <button onclick="toggleDarkMode()" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-yellow-500 dark:text-slate-300">
+      <i class="fas fa-moon" id="theme-icon-mobile"></i>
+    </button>
+  </header>
+
+  <!-- OVERLAY GELAP (Untuk saat sidebar HP dibuka) -->
+  <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/50 z-30 md:hidden transition-opacity" onclick="toggleSidebar()"></div>  
   <!-- SIDEBAR -->
   <aside class="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col transition-colors duration-300">
     <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex flex-col items-center">
