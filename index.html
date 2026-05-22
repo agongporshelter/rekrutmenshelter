@@ -8,11 +8,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body { background-color: #f4f6f9; }
-    .sidebar { min-height: 100vh; background-color: #343a40; padding-top: 20px;}
-    .sidebar a { color: #b0b0b0; padding: 15px 20px; display: block; text-decoration: none; font-size: 14px; }
-    .sidebar a:hover, .sidebar a.active { background-color: #495057; color: #fff; }
+    .sidebar { min-height: 100vh; background-color: #2c3e50; padding-top: 20px;}
+    .sidebar a { color: #ecf0f1; padding: 15px 20px; display: block; text-decoration: none; font-size: 15px; border-bottom: 1px solid #34495e; }
+    .sidebar a:hover, .sidebar a.active { background-color: #3498db; color: #fff; }
     .content-area { padding: 30px; }
-    .badge-role { font-size: 12px; }
+    .login-bg { background-color: #ecf0f1; height: 100vh; display: flex; align-items: center; justify-content: center; }
   </style>
 </head>
 <body>
@@ -20,26 +20,50 @@
 <!-- GANTI DENGAN URL GOOGLE APPS SCRIPT ANDA -->
 <script>const API_URL = 'MASUKKAN_URL_WEB_APP_GAS_ANDA_DISINI';</script>
 
-<div class="container-fluid">
-  <div class="row">
+<!-- ========================================== -->
+<!-- HALAMAN LOGIN                              -->
+<!-- ========================================== -->
+<div id="login-screen" class="login-bg">
+  <div class="card shadow" style="width: 400px;">
+    <div class="card-body p-5">
+      <h3 class="text-center mb-4 text-primary fw-bold">Monitoring Rekrutmen</h3>
+      <div id="login-error" class="alert alert-danger d-none"></div>
+      <div class="mb-3">
+        <label class="form-label fw-bold">Username</label>
+        <input type="text" id="login-username" class="form-control" placeholder="Masukkan username">
+      </div>
+      <div class="mb-4">
+        <label class="form-label fw-bold">Password</label>
+        <input type="password" id="login-password" class="form-control" placeholder="Masukkan password">
+      </div>
+      <button class="btn btn-primary w-100 fw-bold" onclick="doLogin()">LOGIN</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- HALAMAN UTAMA APLIKASI                     -->
+<!-- ========================================== -->
+<div id="app-screen" class="d-none">
+  <div class="row g-0">
     
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR MENU -->
     <div class="col-md-2 sidebar p-0">
-      <h5 class="text-white text-center py-3 border-bottom border-secondary"><i class="fas fa-users-cog"></i> Rekrutmen</h5>
-      <a href="#" onclick="showPage('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-      <a href="#" onclick="showPage('requests')"><i class="fas fa-file-alt"></i> Permintaan TK</a>
-      <a href="#" onclick="showPage('users')" id="nav-users" style="display:none;"><i class="fas fa-user-cog"></i> Manajemen User</a>
-      <a href="#" onclick="logout()" class="text-danger mt-5"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      <h5 class="text-white text-center py-4 border-bottom border-secondary"><i class="fas fa-building"></i> REKRUTMEN</h5>
+      <a href="#" class="active" id="nav-dashboard" onclick="showPage('dashboard')"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
+      <a href="#" id="nav-requests" onclick="showPage('requests')"><i class="fas fa-file-alt me-2"></i> Permintaan TK</a>
+      <a href="#" id="nav-users" onclick="showPage('users')"><i class="fas fa-users-cog me-2"></i> Manajemen User</a>
+      <a href="#" onclick="logout()" class="text-danger mt-5"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
     </div>
 
-    <!-- MAIN CONTENT -->
+    <!-- KONTEN UTAMA -->
     <div class="col-md-10 content-area">
       
-      <div class="d-flex justify-content-between align-items-center mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm">
         <div>
-          <h3 id="greeting">Selamat Datang</h3>
-          <span class="badge bg-primary badge-role" id="role-display"></span>
-          <span class="badge bg-secondary badge-role" id="branch-display"></span>
+          <h4 class="mb-0" id="greeting">Selamat Datang</h4>
+          <span class="badge bg-primary" id="role-display"></span>
+          <span class="badge bg-secondary" id="branch-display"></span>
         </div>
       </div>
 
@@ -55,30 +79,34 @@
       <!-- PAGE: PERMINTAAN TK -->
       <div id="page-requests" style="display:none;">
         <div class="card shadow-sm">
-          <div class="card-header bg-white d-flex justify-content-between">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Daftar Permintaan Tenaga Kerja</h5>
-            <button class="btn btn-primary btn-sm" id="btn-add-req" onclick="showRequestForm()">+ Tambah Permintaan</button>
+            <button class="btn btn-primary btn-sm" id="btn-add-req" onclick="showRequestForm()"><i class="fas fa-plus me-1"></i> Tambah Permintaan</button>
           </div>
           <div class="card-body">
-            <table class="table table-hover align-middle">
-              <thead class="table-light"><tr><th>Site/Bagian</th><th>Layanan</th><th>Tgl Permintaan</th><th>Qty Req</th><th>Mapped</th><th>Diterima</th><th>Aksi</th></tr></thead>
-              <tbody id="table-requests"></tbody>
-            </table>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead class="table-light">
+                  <tr><th>Site/Bagian</th><th>Layanan</th><th>Tgl Permintaan</th><th>Qty Request</th><th>Qty Mapped</th><th>Diterima</th><th>Aksi</th></tr>
+                </thead>
+                <tbody id="table-requests"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- PAGE: MANAJEMEN USER (BARU) -->
+      <!-- PAGE: MANAJEMEN USER -->
       <div id="page-users" style="display:none;">
         <div class="card shadow-sm">
-          <div class="card-header bg-white d-flex justify-content-between">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Manajemen User & Akses</h5>
-            <button class="btn btn-success btn-sm" onclick="showUserForm()"><i class="fas fa-plus"></i> Tambah User</button>
+            <button class="btn btn-success btn-sm" onclick="showUserForm()"><i class="fas fa-plus me-1"></i> Tambah User</button>
           </div>
           <div class="card-body">
             <table class="table table-hover align-middle">
               <thead class="table-dark">
-                <tr><th>Nama</th><th>Username</th><th>Role</th><th>Branch</th><th>Sub Branch</th><th>Aksi</th></tr>
+                <tr><th>Nama Lengkap</th><th>Username</th><th>Role</th><th>Branch</th><th>Sub Branch</th><th style="width: 150px;">Aksi</th></tr>
               </thead>
               <tbody id="table-users"></tbody>
             </table>
@@ -90,7 +118,9 @@
   </div>
 </div>
 
-<!-- MODAL: FORM PERMINTAAN -->
+<!-- ========================================== -->
+<!-- MODAL: FORM PERMINTAAN TK                  -->
+<!-- ========================================== -->
 <div class="modal fade" id="modalRequest" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -102,27 +132,38 @@
           <div class="mb-2"><label>Tanggal Permintaan</label><input type="date" class="form-control" name="requestDate" required></div>
           <div class="mb-2"><label>Layanan</label><select class="form-select" name="service" required><option value="Security">Security</option><option value="Labor">Labor</option><option value="Cleaning">Cleaning</option><option value="Logistic">Logistic</option></select></div>
           <div class="mb-2"><label>Jenis TK</label><select class="form-select" name="workerType" required><option value="Reguler">Reguler</option><option value="Casual">Casual</option></select></div>
-          <div class="mb-2"><label>Jumlah TK</label><input type="number" class="form-control" name="qtyRequested" required></div>
-          <div class="mb-2"><label>Durasi Pemenuhan</label><input type="text" class="form-control" name="duration" required></div>
+          <div class="mb-2"><label>Jumlah TK (Qty)</label><input type="number" class="form-control" name="qtyRequested" required></div>
+          <div class="mb-2"><label>Durasi Pemenuhan</label><input type="text" class="form-control" name="duration" placeholder="cth: 7 Hari" required></div>
         </form>
       </div>
-      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button type="button" class="btn btn-primary" onclick="submitRequest()">Simpan</button></div>
+      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button type="button" class="btn btn-primary" onclick="submitRequest()">Simpan Permintaan</button></div>
     </div>
   </div>
 </div>
 
-<!-- MODAL: MAPPING RECRUITER -->
+<!-- ========================================== -->
+<!-- MODAL: MAPPING RECRUITER                   -->
+<!-- ========================================== -->
 <div class="modal fade" id="modalMapping" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header"><h5 class="modal-title">Mapping Recruiter - <span id="map-req-id"></span></h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-header bg-warning text-white"><h5 class="modal-title"><i class="fas fa-sitemap me-2"></i>Mapping Recruiter - <span id="map-req-id"></span></h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
-        <form id="form-mapping" class="row g-2 align-items-end mb-3">
-          <div class="col-md-5"><label>Pilih Recruiter</label><select class="form-select" name="recruiterUsername" id="ddl-recruiter" required></select></div>
-          <div class="col-md-4"><label>Jumlah Mapped</label><input type="number" class="form-control" name="qtyMapped" required></div>
-          <div class="col-md-3"><button type="button" class="btn btn-success w-100" onclick="submitMapping()">Assign</button></div>
+        <form id="form-mapping" class="row g-2 align-items-end mb-3 border p-3 rounded bg-light">
+          <div class="col-md-5">
+            <label class="form-label fw-bold">Pilih Recruiter</label>
+            <select class="form-select" name="recruiterUsername" id="ddl-recruiter" required></select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold">Jumlah Mapped</label>
+            <input type="number" class="form-control" name="qtyMapped" required>
+          </div>
+          <div class="col-md-3">
+            <button type="button" class="btn btn-success w-100" onclick="submitMapping()"><i class="fas fa-check me-1"></i> Assign</button>
+          </div>
         </form>
-        <table class="table table-bordered mt-3">
+        <h6 class="mt-3 fw-bold">Detail Mapping:</h6>
+        <table class="table table-bordered mt-2">
           <thead class="table-dark"><tr><th>Recruiter</th><th>Mapped</th><th>Dipanggil</th><th>Dikirim</th><th>Diterima</th><th>Aksi</th></tr></thead>
           <tbody id="table-mappings"></tbody>
         </table>
@@ -131,7 +172,9 @@
   </div>
 </div>
 
-<!-- MODAL: FORM USER (BARU) -->
+<!-- ========================================== -->
+<!-- MODAL: MANAJEMEN USER                      -->
+<!-- ========================================== -->
 <div class="modal fade" id="modalUser" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -139,11 +182,11 @@
       <div class="modal-body">
         <form id="form-user">
           <input type="hidden" name="id" id="user-id">
-          <div class="mb-2"><label>Nama Lengkap</label><input type="text" class="form-control" name="name" required></div>
-          <div class="mb-2"><label>Username</label><input type="text" class="form-control" name="username" id="user-username" required></div>
-          <div class="mb-2"><label>Password</label><input type="text" class="form-control" name="password" id="user-password" required></div>
+          <div class="mb-2"><label class="form-label fw-bold">Nama Lengkap</label><input type="text" class="form-control" name="name" required></div>
+          <div class="mb-2"><label class="form-label fw-bold">Username</label><input type="text" class="form-control" name="username" id="user-username" required></div>
+          <div class="mb-2"><label class="form-label fw-bold">Password</label><input type="text" class="form-control" name="password" id="user-password" required></div>
           <div class="mb-2">
-            <label>Role</label>
+            <label class="form-label fw-bold">Role</label>
             <select class="form-select" name="role" id="user-role" onchange="handleRoleChange()" required>
               <option value="">-- Pilih Role --</option>
               <option value="Admin">Admin</option>
@@ -155,33 +198,37 @@
           </div>
           
           <div class="mb-2" id="field-branch" style="display:none;">
-            <label>Branch</label>
+            <label class="form-label fw-bold">Branch</label>
             <select class="form-select" name="branchId" id="user-branch" onchange="handleBranchChange()">
               <option value="">-- Pilih Branch --</option>
             </select>
           </div>
 
           <div class="mb-2" id="field-subbranch" style="display:none;">
-            <label>Sub Branch</label>
+            <label class="form-label fw-bold">Sub Branch</label>
             <select class="form-select" name="subBranchId" id="user-subbranch">
               <option value="">-- Pilih Sub Branch --</option>
             </select>
           </div>
         </form>
       </div>
-      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button type="button" class="btn btn-primary" onclick="submitUser()">Simpan</button></div>
+      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button type="button" class="btn btn-primary" onclick="submitUser()">Simpan User</button></div>
     </div>
   </div>
 </div>
 
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   let currentUser = JSON.parse(localStorage.getItem('recUser')) || null;
-  let allBranchesData = []; // Cache data branches
+  let allBranchesData = []; 
   
   window.onload = () => {
-    if(!currentUser) doShowLogin();
-    else initApp();
+    if(!currentUser) {
+      showLoginScreen();
+    } else {
+      initApp();
+    }
   };
 
   // --- API HELPER ---
@@ -203,34 +250,54 @@
   }
 
   // --- AUTH & INIT ---
-  function doShowLogin() {
-    let u = prompt("Masukkan Username:");
-    let p = prompt("Masukkan Password:");
-    if(u && p) doLogin(u, p);
+  function showLoginScreen() {
+    document.getElementById('login-screen').classList.remove('d-none');
+    document.getElementById('app-screen').classList.add('d-none');
   }
 
-  async function doLogin(u, p) {
+  async function doLogin() {
+    const u = document.getElementById('login-username').value;
+    const p = document.getElementById('login-password').value;
+    const errorDiv = document.getElementById('login-error');
+
+    if(!u || !p) {
+      errorDiv.textContent = "Username dan Password harus diisi!";
+      errorDiv.classList.remove('d-none');
+      return;
+    }
+
     const res = await apiPost('login', { username: u, password: p });
     if(res.success) {
       currentUser = res.user;
       localStorage.setItem('recUser', JSON.stringify(currentUser));
+      errorDiv.classList.add('d-none');
       initApp();
     } else {
-      alert(res.message);
-      doShowLogin();
+      errorDiv.textContent = res.message;
+      errorDiv.classList.remove('d-none');
     }
   }
 
   async function initApp() {
+    document.getElementById('login-screen').classList.add('d-none');
+    document.getElementById('app-screen').classList.remove('d-none');
+    
     document.getElementById('greeting').innerText = `Halo, ${currentUser.name}`;
     document.getElementById('role-display').innerText = currentUser.role;
     document.getElementById('branch-display').innerText = currentUser.subBranchId || 'All Branches';
     
-    // Load data cabang sekali saja
     allBranchesData = await apiGet('getBranches');
 
-    // Hak Akses
-    if(currentUser.role === 'Admin') document.getElementById('nav-users').style.display = 'block';
+    // Atur visibilitas menu berdasarkan role
+    document.getElementById('nav-users').style.display = 'none'; // Sembunyikan dulu
+    document.getElementById('btn-add-req').style.display = 'none'; // Sembunyikan dulu
+
+    if(currentUser.role === 'Admin') {
+      document.getElementById('nav-users').style.display = 'block';
+    }
+    if(currentUser.role === 'PIC') {
+      document.getElementById('btn-add-req').style.display = 'block';
+    }
     
     showPage('dashboard');
   }
@@ -244,13 +311,18 @@
   function showPage(page) {
     document.querySelectorAll('[id^="page-"]').forEach(el => el.style.display = 'none');
     document.getElementById('page-' + page).style.display = 'block';
+
+    // Active sidebar
+    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+    document.getElementById('nav-' + page).classList.add('active');
+
     if(page === 'dashboard') loadDashboard();
     if(page === 'requests') loadRequests();
     if(page === 'users') loadUsers();
   }
 
   // =======================================================
-  // DASHBOARD & PERMINTAAN (Kode dari langkah sebelumnya)
+  // DASHBOARD & PERMINTAAN
   // =======================================================
   async function loadDashboard() {
     const res = await apiGet('getRequests', { role: currentUser.role, subBranchId: currentUser.subBranchId, username: currentUser.username });
@@ -264,14 +336,20 @@
     const res = await apiGet('getRequests', { role: currentUser.role, subBranchId: currentUser.subBranchId, username: currentUser.username });
     const tbody = document.getElementById('table-requests');
     tbody.innerHTML = '';
+    
     (res || []).forEach(r => {
+      let actionButtons = '';
+      if(currentUser.role === 'PIC' || currentUser.role === 'Admin') {
+        actionButtons += `<button class="btn btn-sm btn-warning me-1" onclick="openMapping('${r.requestId}')"><i class="fas fa-sitemap"></i> Map</button> `;
+      }
+      if(currentUser.role === 'Recruiter') {
+        actionButtons += `<button class="btn btn-sm btn-info" onclick="openMyProgress('${r.requestId}')"><i class="fas fa-edit"></i> Update</button>`;
+      }
+
       tbody.innerHTML += `<tr>
         <td>${r.siteDept}</td><td>${r.service}</td><td>${r.requestDate}</td>
         <td class="fw-bold">${r.qtyRequested}</td><td>${r.totalMapped}</td><td class="text-success fw-bold">${r.totalAccepted}</td>
-        <td>
-          ${currentUser.role === 'PIC' ? `<button class="btn btn-sm btn-warning" onclick="openMapping('${r.requestId}')"><i class="fas fa-sitemap"></i> Map</button>` : ''}
-          ${currentUser.role === 'Recruiter' ? `<button class="btn btn-sm btn-info" onclick="openMyProgress('${r.requestId}')"><i class="fas fa-edit"></i> Update</button>` : ''}
-        </td>
+        <td>${actionButtons}</td>
       </tr>`;
     });
   }
@@ -300,8 +378,11 @@
     const users = await apiGet('getUsers');
     const ddl = document.getElementById('ddl-recruiter');
     ddl.innerHTML = '<option value="">-- Pilih Recruiter --</option>';
+    
+    // Ambil recruiter di sub branch yang sama
     users.filter(u => (u.role === 'Recruiter' || u.role === 'PIC') && u.subBranchId === currentUser.subBranchId)
          .forEach(u => ddl.innerHTML += `<option value="${u.username}">${u.name} (${u.username})</option>`);
+    
     loadMappings();
     new bootstrap.Modal(document.getElementById('modalMapping')).show();
   }
@@ -313,7 +394,7 @@
     (res || []).forEach(m => {
       tbody.innerHTML += `<tr>
         <td>${m.recruiterUsername}</td><td>${m.qtyMapped}</td><td>${m.qtyCalled}</td><td>${m.qtySent}</td><td>${m.qtyAccepted}</td>
-        <td><button class="btn btn-sm btn-primary" onclick="updateProgress('${m.mappingId}')">Update Progress</button></td>
+        <td><button class="btn btn-sm btn-primary" onclick="updateProgress('${m.mappingId}')"><i class="fas fa-edit me-1"></i> Update</button></td>
       </tr>`;
     });
   }
@@ -328,12 +409,14 @@
 
   async function updateProgress(mappingId) {
     const called = prompt("Masukkan Jumlah Dipanggil:");
+    if(called === null) return;
     const sent = prompt("Masukkan Jumlah Dikirim:");
+    if(sent === null) return;
     const accepted = prompt("Masukkan Jumlah Diterima:");
-    if(called !== null && sent !== null && accepted !== null) {
-      const res = await apiPost('updateRecruiterProgress', { mappingId, qtyCalled: called, qtySent: sent, qtyAccepted: accepted });
-      if(res.success) { alert('Berhasil diupdate!'); loadMappings(); }
-    }
+    if(accepted === null) return;
+    
+    const res = await apiPost('updateRecruiterProgress', { mappingId, qtyCalled: called, qtySent: sent, qtyAccepted: accepted });
+    if(res.success) { alert('Berhasil diupdate!'); loadMappings(); loadRequests(); }
   }
 
   async function openMyProgress(requestId) {
@@ -345,7 +428,7 @@
   }
 
   // =======================================================
-  // MANAJEMEN USER (BARU)
+  // MANAJEMEN USER
   // =======================================================
   async function loadUsers() {
     const res = await apiGet('getUsers');
@@ -355,14 +438,14 @@
     (res || []).forEach(u => {
       const bInfo = allBranchesData.find(b => b.subBranchId === u.subBranchId);
       const bName = bInfo ? bInfo.branchName : (u.role === 'Admin' || u.role === 'GM' ? 'All Branches' : '-');
-      const sbName = bInfo ? bInfo.subBranchName : '-';
+      const sbName = bInfo ? bInfo.subBranchName : (u.role === 'BM' ? 'All Sub' : '-');
 
-      // Warna Badge Role
       let roleColor = 'secondary';
       if(u.role === 'Admin') roleColor = 'dark';
       if(u.role === 'GM') roleColor = 'primary';
       if(u.role === 'BM') roleColor = 'success';
       if(u.role === 'PIC') roleColor = 'info';
+      if(u.role === 'Recruiter') roleColor = 'warning';
 
       tbody.innerHTML += `<tr>
         <td>${u.name}</td>
@@ -386,31 +469,31 @@
     document.getElementById('field-branch').style.display = 'none';
     document.getElementById('field-subbranch').style.display = 'none';
 
-    // Isi dropdown branch
     const ddlBranch = document.getElementById('user-branch');
     ddlBranch.innerHTML = '<option value="">-- Pilih Branch --</option>';
-    const uniqueBranches = [...new Map(allBranchesData.map(item => [item.branchId, item.branchName])).values()];
+    
+    // Isi unik branch
+    const map = new Map();
+    allBranchesData.forEach(item => map.set(item.branchId, item.branchName));
+    const uniqueBranches = Array.from(map.entries());
     uniqueBranches.forEach(b => ddlBranch.innerHTML += `<option value="${b[0]}">${b[1]}</option>`);
 
-    // Jika Edit
     if(userId) {
       document.getElementById('user-form-title').innerText = 'Edit User';
-      // Cari data user dari cache (opsional, atau fetch ulang). Disini kita fetch ringan.
       apiGet('getUsers').then(users => {
         const u = users.find(x => x.id === userId);
         if(u) {
           document.getElementById('user-id').value = u.id;
-          document.getElementById('user-name').value = u.name; // Pastikan id form sesuai
+          document.getElementById('form-user').name.value = u.name;
           document.getElementById('user-username').value = u.username;
           document.getElementById('user-password').value = u.password;
           document.getElementById('user-role').value = u.role;
           
-          // Trigger change role & isi branch/subbranch
           handleRoleChange();
           if(u.branchId) {
             document.getElementById('user-branch').value = u.branchId;
             handleBranchChange();
-            if(u.subBranchId) document.getElementById('user-subbranch').value = u.subBranchId;
+            setTimeout(() => { document.getElementById('user-subbranch').value = u.subBranchId; }, 500);
           }
         }
       });
