@@ -231,25 +231,42 @@
     }
   };
 
-  // --- API HELPER ---
+  // --- API HELPER DENGAN ERROR HANDLING ---
   async function apiGet(action, params = {}) {
     const url = new URL(API_URL);
     url.searchParams.append('action', action);
     for (let key in params) url.searchParams.append(key, params[key]);
-    const res = await fetch(url);
-    return await res.json();
+    
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      return await res.json();
+    } catch (error) {
+      console.error("API Get Error:", error);
+      alert("Gagal mengambil data dari server. Pastikan URL API sudah benar dan deploy GAS sudah dilakukan!");
+      return [];
+    }
   }
 
   async function apiPost(action, data) {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action, data })
-    });
-    return await res.json();
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action, data })
+      });
+      
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      
+      return await res.json();
+    } catch (error) {
+      console.error("API Post Error:", error);
+      // Kembalikan objek error agar doLogin bisa menampilkannya
+      return { success: false, message: "Koneksi ke server gagal! Cek kembali URL Web App GAS Anda di kode HTML." };
+    }
   }
 
-  // --- AUTH & INIT ---
+  // --- AUTH & INIT DENGAN ERROR HANDLING ---
   function showLoginScreen() {
     document.getElementById('login-screen').classList.remove('d-none');
     document.getElementById('app-screen').classList.add('d-none');
@@ -266,14 +283,18 @@
       return;
     }
 
+    // Tampilkan loading atau ubah tombol (opsional)
+    errorDiv.classList.add('d-none'); // Sembunyikan error lama
+
     const res = await apiPost('login', { username: u, password: p });
+    
     if(res.success) {
       currentUser = res.user;
       localStorage.setItem('recUser', JSON.stringify(currentUser));
-      errorDiv.classList.add('d-none');
       initApp();
     } else {
-      errorDiv.textContent = res.message;
+      // Jika gagal, tampilkan pesan error dari backend atau dari catch apiPost
+      errorDiv.textContent = res.message || "Login gagal!";
       errorDiv.classList.remove('d-none');
     }
   }
