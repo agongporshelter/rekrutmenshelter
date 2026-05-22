@@ -274,23 +274,31 @@
   }
 
   async function initApp() {
-    document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app-screen').classList.remove('hidden');
+    document.getElementById('login-screen').classList.add('hidden'); 
+    document.getElementById('app-screen').classList.remove('hidden');
     document.getElementById('greeting').innerText = `Halo, ${currentUser.name}`;
     document.getElementById('role-display').innerText = currentUser.role;
     
+    // Ambil data branch terlebih dahulu
+    allBranchesData = await apiGet('getBranches');
+
     // Logika ubah Sub Branch ID menjadi Nama
     let displayBranch = 'All Branches';
     if (currentUser.subBranchId) {
+      // Cari data branch yang subBranchId-nya sama dengan milik user
       const branchInfo = allBranchesData.find(b => b.subBranchId === currentUser.subBranchId);
+      // Jika ketemu, tampilkan namanya. Jika tidak, tampilkan ID-nya sebagai fallback
       displayBranch = branchInfo ? branchInfo.subBranchName : currentUser.subBranchId;
     }
     document.getElementById('branch-display').innerText = displayBranch;
 
+    // Atur visibilitas menu berdasarkan role
     document.getElementById('nav-users').style.display = ['Admin'].includes(currentUser.role) ? 'flex' : 'none';
     document.getElementById('btn-add-req').style.display = ['PIC', 'Admin'].includes(currentUser.role) ? 'block' : 'none';
+    
     showPage('dashboard');
   }
-
+  
   function logout() { localStorage.removeItem('recUser'); location.reload(); }
 
   function showPage(page) {
