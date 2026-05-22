@@ -114,7 +114,7 @@
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-300 text-xs uppercase tracking-wider">
-                <th class="p-4 border-y dark:border-slate-600">Site/Bagian</th><th class="p-4 border-y dark:border-slate-600">Layanan</th><th class="p-4 border-y dark:border-slate-600">Tgl Permintaan</th><th class="p-4 border-y dark:border-slate-600">Qty Req</th><th class="p-4 border-y dark:border-slate-600">Diterima</th><th class="p-4 border-y dark:border-slate-600">Tgl Pemenuhan</th><th class="p-4 border-y dark:border-slate-600">Aksi</th>
+                <th class="p-4 border-y dark:border-slate-600">Site/Bagian</th><th class="p-4 border-y dark:border-slate-600">Layanan</th><th class="p-4 border-y dark:border-slate-600">Tgl Permintaan</th><th class="p-4 border-y dark:border-slate-600">Qty Req</th><th class="p-4 border-y dark:border-slate-600">Recruiter</th><th class="p-4 border-y dark:border-slate-600">Diterima</th><th class="p-4 border-y dark:border-slate-600">Tgl Pemenuhan</th><th class="p-4 border-y dark:border-slate-600">Aksi</th>
               </tr>
             </thead>
             <tbody id="table-requests" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
@@ -305,22 +305,37 @@
 
   // === PERMINTAAN TK ===
   async function loadRequests() {
-    const res = await apiGet('getRequests', { role: currentUser.role, subBranchId: currentUser.subBranchId, username: currentUser.username }); const tbody = document.getElementById('table-requests'); tbody.innerHTML = '';
+    const res = await apiGet('getRequests', { role: currentUser.role, subBranchId: currentUser.subBranchId, username: currentUser.username }); 
+    const tbody = document.getElementById('table-requests'); 
+    tbody.innerHTML = '';
+    
     (res || []).forEach(r => {
       let act = ''; 
       if(['PIC','Admin'].includes(currentUser.role)) {
-        // Menggunakan encodeURIComponent agar karakter spesial di SiteDept aman untuk dikirim ke fungsi
         act += `<button onclick="openMapping('${r.requestId}', '${encodeURIComponent(r.siteDept)}', ${r.qtyRequested}, ${r.totalMapped})" class="text-amber-500 hover:text-amber-700 mr-2" title="Mapping"><i class="fas fa-sitemap"></i></button>`; 
       }
       if(currentUser.role === 'Recruiter') act += `<button onclick="openMyProgress('${r.requestId}')" class="text-blue-500 hover:text-blue-700" title="Update Progress"><i class="fas fa-edit"></i></button>`;
       
       const fulfillDate = r.fulfillmentDate ? r.fulfillmentDate : '<span class="text-slate-400 dark:text-slate-500">-</span>';
       
+      // --- BARU: Render Badge Recruiter ---
+      let recruitersHtml = '<span class="text-slate-400 dark:text-slate-500 text-xs">-</span>';
+      if (r.recruiters && r.recruiters.length > 0) {
+        recruitersHtml = r.recruiters.map(name => 
+          `<span class="inline-block bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full px-2 py-0.5 text-xs font-medium mr-1 mb-1">${name}</span>`
+        ).join('');
+      }
+      
       tbody.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
-        <td class="p-4 font-medium">${r.siteDept}</td><td class="p-4 text-slate-500 dark:text-slate-400">${r.service}</td><td class="p-4 text-slate-500 dark:text-slate-400">${r.requestDate}</td>
-        <td class="p-4 font-bold">${r.qtyRequested}</td><td class="p-4 text-emerald-500 font-bold">${r.totalAccepted}</td>
+        <td class="p-4 font-medium">${r.siteDept}</td>
+        <td class="p-4 text-slate-500 dark:text-slate-400">${r.service}</td>
+        <td class="p-4 text-slate-500 dark:text-slate-400">${r.requestDate}</td>
+        <td class="p-4">${recruitersHtml}</td> <!-- KOLOM BARU -->
+        <td class="p-4 font-bold">${r.qtyRequested}</td>
+        <td class="p-4 text-emerald-500 font-bold">${r.totalAccepted}</td>
         <td class="p-4 text-xs font-semibold ${r.fulfillmentDate ? 'text-emerald-600 dark:text-emerald-400' : ''}">${fulfillDate}</td>
-        <td class="p-4">${act}</td></tr>`;
+        <td class="p-4">${act}</td>
+      </tr>`;
     });
   }
   
