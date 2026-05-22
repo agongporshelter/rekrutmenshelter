@@ -27,19 +27,13 @@
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300">
 
 <script>const API_URL = 'https://script.google.com/macros/s/AKfycbyqp5tiSFgZ9znvHYQVOfTqmyVGLD29LllSZ3_bcjQNiFna_SV8yQPXPIaJTAVXe1ma/exec';</script>
-
-<!-- URL Logo -->
-<script>
-  const LOGO_BLUE = 'https://z-cdn-media.chatglm.cn/files/9ab8b65d-de87-449b-9845-24c41f373e1f.png?auth_key=1879420257-135c21a55bff4f31ac827b7562066617-0-8ae8d40b686c9d116cba7976e1803a8f';
-  const LOGO_WHITE = 'https://z-cdn-media.chatglm.cn/files/ff3c9e26-bde6-4813-8822-2940cf90d57d.png?auth_key=1879420840-aee87e506836431d895e946fa7b16291-0-cdb68064fa5da0e586c638cc0207ea0e';
-</script>
-
+ 
 <!-- HALAMAN LOGIN -->
 <div id="login-screen" class="min-h-screen flex items-center justify-center bg-slate-900 dark:bg-black">
   <div class="w-full max-w-md p-8 bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10">
     <div class="flex flex-col items-center mb-6">
       <!-- Logo Login (Putih, karena background login selalu gelap) -->
-      <img src="${LOGO_WHITE}" class="h-10 mb-3" alt="Logo">
+      <img src="https://z-cdn-media.chatglm.cn/files/ff3c9e26-bde6-4813-8822-2940cf90d57d.png?auth_key=1879420840-aee87e506836431d895e946fa7b16291-0-cdb68064fa5da0e586c638cc0207ea0e" class="h-10 mb-3" alt="Logo">
       <h2 class="text-3xl font-bold text-white tracking-tight">MONITORING</h2>
       <p class="text-slate-400 text-sm">Rekrutmen TK</p>
     </div>
@@ -65,12 +59,12 @@
   <!-- SIDEBAR -->
   <aside class="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col transition-colors duration-300">
     <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex flex-col items-center">
-      <!-- Logo Sidebar Ganda (Bergantian saat ganti tema) -->
-      <div class="flex justify-center items-center h-8 mb-2">
-        <img src="${LOGO_BLUE}" class="h-8 dark:hidden" alt="Logo Biru">
-        <img src="${LOGO_WHITE}" class="h-8 hidden dark:block" alt="Logo Putih">
-      </div>
-      <h1 class="text-xl font-bold tracking-tight">MONITORING</h1>
+    <!-- Logo Sidebar Ganda (Bergantian saat ganti tema) -->
+    <div class="flex justify-center items-center h-8 mb-2">
+      <img src="https://z-cdn-media.chatglm.cn/files/9ab8b65d-de87-449b-9845-24c41f373e1f.png?auth_key=1879420257-135c21a55bff4f31ac827b7562066617-0-8ae8d40b686c9d116cba7976e1803a8f" class="h-8 dark:hidden" alt="Logo Biru">
+      <img src="https://z-cdn-media.chatglm.cn/files/ff3c9e26-bde6-4813-8822-2940cf90d57d.png?auth_key=1879420840-aee87e506836431d895e946fa7b16291-0-cdb68064fa5da0e586c638cc0207ea0e" class="h-8 hidden dark:block" alt="Logo Putih">
+    </div>
+    <h1 class="text-xl font-bold tracking-tight">MONITORING</h1>
     </div>
     <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
       <a href="#" onclick="showPage('dashboard')" id="nav-dashboard" class="nav-link flex items-center px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"><i class="fas fa-chart-pie w-5 mr-3 text-slate-400"></i> Dashboard</a>
